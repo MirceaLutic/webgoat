@@ -11,9 +11,25 @@ jobs:
       - checkout
       - run: echo "This is a test step"
 
+  odc-backend:
+    machine: true
+    steps:
+      - checkout
+
+      - run: chmod +x ./run-depcheck.sh && ./run-depcheck.sh
+
+      - store_artifacts:
+          path: reports/dependency-check-report.json
+          destination: depcheck-artifact
+
 workflows:
   version: 2
   django:
     jobs:
       - build
-      - test
+      - test:
+          requires:
+            - build
+      - odc-backend:
+          requires:
+            - test
